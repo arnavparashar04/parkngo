@@ -1,5 +1,6 @@
+import { SafeAreaView } from 'react-native-safe-area-context';
 import React from 'react';
-import { StyleSheet, View, Text, ScrollView, TouchableOpacity, SafeAreaView, Switch } from 'react-native';
+import { StyleSheet, View, Text, ScrollView, TouchableOpacity, Switch } from 'react-native';
 
 export default function ProfileScreen() {
   // Mock data for user profile

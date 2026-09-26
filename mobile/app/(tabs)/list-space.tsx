@@ -1,5 +1,6 @@
+import { SafeAreaView } from 'react-native-safe-area-context';
 import React from 'react';
-import { StyleSheet, View, Text, ScrollView, TouchableOpacity, SafeAreaView } from 'react-native';
+import { StyleSheet, View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 
 export default function OwnerDashboard() {
@@ -56,7 +57,7 @@ export default function OwnerDashboard() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>My Listings</Text>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => router.push('/owner/add')}>
               <Text style={styles.addButton}>+ Add Space</Text>
             </TouchableOpacity>
           </View>
