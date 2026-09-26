@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 
-const API_BASE_URL = 'http://172.29.45.137:8000';
+const API_BASE_URL = 'http://10.13.36.137:8000';
 
 export default function ParkingDetailsScreen() {
   const { id } = useLocalSearchParams();

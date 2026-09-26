@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { StyleSheet, View, Text, TextInput, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import * as Location from 'expo-location';
@@ -7,59 +7,61 @@ import LeafletMap from '../../components/LeafletMap';
 import ShimmerPlaceholder from '../../components/ShimmerPlaceholder';
 
 // Updated IP address based on current network interface
-const API_BASE_URL = 'http://172.29.45.137:8000';
+const API_BASE_URL = 'http://10.13.36.137:8000';
 
 export default function HomeScreen() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   const [nearbyParking, setNearbyParking] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [showList, setShowList] = useState(true);
   
+  // 3 distinct location concepts:
+  // 1. userLocation  - GPS blue dot (never moves unless GPS updates)
+  // 2. searchLocation - purple pin where user searched (set after selecting a yellow result)
+  // 3. searchResults  - yellow pins showing geocoding matches (shown before user picks one)
   const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null);
   const [searchLocation, setSearchLocation] = useState<{lat: number, lng: number} | null>(null);
   const [searchResults, setSearchResults] = useState<any[]>([]);
-  // Default map center
   const [mapCenter, setMapCenter] = useState({ lat: 12.9353, lng: 77.5348 });
 
+  // ── Fetch parking spots within 1km of a coordinate ──
   const fetchNearbyParking = async (lat: number, lng: number) => {
     try {
       setLoading(true);
-      // Strictly 1km radius
-      const response = await fetch(`${API_BASE_URL}/api/parking/nearby?lat=${lat}&lng=${lng}&vehicle_type=SUV&radius_km=1.0`);
+      const response = await fetch(
+        `${API_BASE_URL}/api/parking/nearby?lat=${lat}&lng=${lng}&vehicle_type=SUV&radius_km=1.0`
+      );
       
       if (response.ok) {
         let results = await response.json();
-        
-        // Calculate estimated walking time (approx 80 meters per minute)
+        // Add walking time estimate (~80 m/min walking speed)
         results = results.map((space: any) => ({
           ...space,
-          walk_time_mins: Math.ceil(space.distance / 80)
+          walk_time_mins: Math.max(1, Math.ceil(space.distance / 80)),
         }));
-        
         setNearbyParking(results);
-        if (results.length === 0) {
-          Alert.alert("No spots found", "No parking spots found within 1km of this location.");
-        }
       } else {
         console.error('Failed to fetch parking spaces:', response.status);
+        setNearbyParking([]);
       }
     } catch (error) {
       console.error('Error fetching parking:', error);
+      setNearbyParking([]);
     } finally {
       setLoading(false);
     }
   };
 
+  // ── Get user's real GPS location on mount ──
   const getUserLocation = async () => {
     try {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
-        Alert.alert('Permission to access location was denied');
-        // Fallback to default location
+        Alert.alert('Location Permission Denied', 'Showing default location.');
         fetchNearbyParking(mapCenter.lat, mapCenter.lng);
         return;
       }
-
       const location = await Location.getCurrentPositionAsync({});
       const { latitude, longitude } = location.coords;
       setUserLocation({ lat: latitude, lng: longitude });
@@ -75,43 +77,30 @@ export default function HomeScreen() {
     getUserLocation();
   }, []);
 
+  // ── Search: geocode query → show yellow pins ──
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
     try {
       setLoading(true);
-      // Use Nominatim free geocoding API with required User-Agent header
       const response = await fetch(
         `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}`,
-        {
-          headers: {
-            'User-Agent': 'ParkNGoApp/1.0',
-            'Accept-Language': 'en-US,en;q=0.9'
-          }
-        }
+        { headers: { 'User-Agent': 'ParkNGoApp/1.0', 'Accept-Language': 'en-US,en;q=0.9' } }
       );
-      
       const text = await response.text();
       let data;
-      try {
-        data = JSON.parse(text);
-      } catch (e) {
-        console.error("Nominatim responded with non-JSON:", text.substring(0, 100));
-        throw new Error("Invalid response from map server");
+      try { data = JSON.parse(text); } catch (e) {
+        console.error('Nominatim non-JSON:', text.substring(0, 100));
+        throw new Error('Invalid response');
       }
-      
+
       if (data && data.length > 0) {
-        // Clear previous parking spots while we wait for user to select a location
+        // Phase 1: clear old parking, show yellow location pins
         setNearbyParking([]);
         setSearchLocation(null);
-        // Show up to 5 best matches
         setSearchResults(data.slice(0, 5));
-        
-        // Center map to the first match so they are in view
-        const lat = parseFloat(data[0].lat);
-        const lng = parseFloat(data[0].lon);
-        setMapCenter({ lat, lng });
+        setMapCenter({ lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) });
       } else {
-        Alert.alert('Location not found', 'Please try a different search term.');
+        Alert.alert('Location not found', 'Try a different search term.');
       }
     } catch (error) {
       console.error('Geocoding error:', error);
@@ -121,27 +110,25 @@ export default function HomeScreen() {
     }
   };
 
+  // ── User taps a yellow pin → confirm that location, fetch parking ──
+  const handleSearchResultSelect = (lat: number, lng: number) => {
+    setSearchResults([]);           // remove yellow pins
+    setSearchLocation({ lat, lng }); // drop purple pin
+    setMapCenter({ lat, lng });
+    fetchNearbyParking(lat, lng);    // fetch 1km radius parking
+  };
+
   const handleMarkerPress = (id: string) => {
     router.push(`/parking/${id}`);
   };
-
-  const handleSearchResultSelect = (lat: number, lng: number) => {
-    // Clear search results and fetch parking
-    setSearchResults([]);
-    setSearchLocation({ lat, lng });
-    setMapCenter({ lat, lng });
-    fetchNearbyParking(lat, lng);
-  };
-
-  const [showList, setShowList] = useState(true);
 
   return (
     <SafeAreaView style={styles.container}>
       {/* Search Bar */}
       <View style={styles.searchContainer}>
-        <TextInput 
+        <TextInput
           style={styles.searchInput}
-          placeholder="🔍 Where are you going?"
+          placeholder="🔍 Search a destination..."
           placeholderTextColor="#888"
           value={searchQuery}
           onChangeText={setSearchQuery}
@@ -150,9 +137,9 @@ export default function HomeScreen() {
         />
       </View>
 
-      {/* Interactive Dark Map (OpenStreetMap / Leaflet) - No API Key Needed */}
-      <LeafletMap 
-        spaces={nearbyParking} 
+      {/* Map – 3 marker types: blue dot (you), yellow (search candidates), red (parking) + purple (selected) */}
+      <LeafletMap
+        spaces={nearbyParking}
         searchResults={searchResults}
         onMarkerPress={handleMarkerPress}
         onSearchResultSelect={handleSearchResultSelect}
@@ -164,11 +151,11 @@ export default function HomeScreen() {
         searchLng={searchLocation?.lng}
       />
 
-      {/* Bottom Container */}
+      {/* Bottom Panel */}
       <View style={styles.bottomContainer}>
         {loading ? (
           <View style={styles.listContainer}>
-            <Text style={styles.listTitle}>Loading Spots...</Text>
+            <Text style={styles.listTitle}>Finding parking...</Text>
             {[1, 2].map((i) => (
               <View key={i} style={styles.listItem}>
                 <View>
@@ -179,33 +166,47 @@ export default function HomeScreen() {
               </View>
             ))}
           </View>
-        ) : nearbyParking.length > 0 && (
+        ) : nearbyParking.length > 0 ? (
           <View style={styles.listContainer}>
             <View style={styles.listHeader}>
-              <Text style={styles.listTitle}>Recommended Spots</Text>
+              <Text style={styles.listTitle}>
+                Nearby Parking ({nearbyParking.length})
+              </Text>
               <TouchableOpacity onPress={() => setShowList(!showList)}>
-                <Text style={styles.toggleText}>{showList ? 'Hide' : 'Show'}</Text>
+                <Text style={styles.toggleText}>{showList ? 'Hide ▾' : 'Show ▸'}</Text>
               </TouchableOpacity>
             </View>
-            
-            {showList && nearbyParking.slice(0, 3).map(space => (
-              <TouchableOpacity key={space.id} style={styles.listItem} onPress={() => handleMarkerPress(space.id)}>
-                <View style={{flex: 1}}>
-                  <Text style={styles.listName} numberOfLines={1}>{space.name}</Text>
-                  <Text style={styles.listDetails}>Score: {space.recommendation_score} • {space.distance_formatted} • 🚶 {space.walk_time_mins} min</Text>
-                </View>
-                <Text style={styles.listPrice}>₹{space.price_per_hour}/hr</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        )}
 
-        <TouchableOpacity 
+            {showList && (
+              <ScrollView style={{ maxHeight: 180 }} nestedScrollEnabled>
+                {nearbyParking.map(space => (
+                  <TouchableOpacity key={space.id} style={styles.listItem} onPress={() => handleMarkerPress(space.id)}>
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.listName} numberOfLines={1}>{space.name}</Text>
+                      <Text style={styles.listDetails}>
+                        {space.distance_formatted} away • 🚶 {space.walk_time_mins} min walk
+                      </Text>
+                    </View>
+                    <Text style={styles.listPrice}>₹{space.price_per_hour}/hr</Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            )}
+          </View>
+        ) : searchResults.length > 0 ? (
+          <View style={styles.listContainer}>
+            <Text style={styles.listTitle}>Tap a yellow pin to select location</Text>
+          </View>
+        ) : null}
+
+        <TouchableOpacity
           style={styles.primaryButton}
           onPress={() => fetchNearbyParking(mapCenter.lat, mapCenter.lng)}
           disabled={loading}
         >
-          <Text style={styles.primaryButtonText}>{loading ? 'Finding Parking...' : 'Refresh Parking'}</Text>
+          <Text style={styles.primaryButtonText}>
+            {loading ? 'Searching...' : '🅿️ Find Parking Here'}
+          </Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -236,22 +237,6 @@ const styles = StyleSheet.create({
   searchInput: {
     fontSize: 16,
     color: '#FFF',
-  },
-  map: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  markerContainer: {
-    backgroundColor: '#FFD700',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
-    borderColor: '#000',
-    borderWidth: 1,
-  },
-  markerText: {
-    fontWeight: 'bold',
-    fontSize: 12,
-    color: '#000',
   },
   bottomContainer: {
     position: 'absolute',
@@ -324,5 +309,5 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: 'bold',
     color: '#FFD700',
-  }
+  },
 });
