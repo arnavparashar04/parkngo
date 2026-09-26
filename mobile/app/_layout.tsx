@@ -7,7 +7,7 @@ function CustomSplashScreen({ onFinish }: { onFinish: () => void }) {
     // Show GIF animation and then start the app immediately after it plays once
     const finishTimer = setTimeout(() => {
       onFinish();
-    }, 1400); // Reduced duration so the GIF doesn't loop twice
+    }, 2300); // 2.3 seconds matches the new GIF duration perfectly
 
     return () => {
       clearTimeout(finishTimer);

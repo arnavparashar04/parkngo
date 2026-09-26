@@ -1,3 +1,5 @@
+import 'dotenv/config';
+
 export default {
   expo: {
     name: "mobile",
@@ -9,11 +11,13 @@ export default {
     userInterfaceStyle: "dark",
     ios: {
       supportsTablet: true,
+      bundleIdentifier: "com.arnav.parkngo",
       config: {
         googleMapsApiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY
       }
     },
     android: {
+      package: "com.arnav.parkngo",
       adaptiveIcon: {
         backgroundColor: "#E6F4FE",
         foregroundImage: "./assets/android-icon-foreground.png",
