@@ -3,8 +3,10 @@ import React, { useState } from 'react';
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity, TextInput, Image, ActivityIndicator, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
+import * as Location from 'expo-location';
 
 const API_BASE_URL = 'http://10.13.36.137:8000';
+
 
 export default function OwnerDashboard() {
   const router = useRouter();
@@ -184,6 +186,24 @@ export default function OwnerDashboard() {
                 keyboardType="decimal-pad" value={longitude} onChangeText={setLongitude} />
             </View>
           </View>
+
+          <TouchableOpacity style={styles.locationButton} onPress={async () => {
+            try {
+              const { status } = await Location.requestForegroundPermissionsAsync();
+              if (status !== 'granted') {
+                Alert.alert('Location permission denied');
+                return;
+              }
+              const loc = await Location.getCurrentPositionAsync({});
+              setLatitude(loc.coords.latitude.toFixed(7));
+              setLongitude(loc.coords.longitude.toFixed(7));
+              Alert.alert('Location set!', `${loc.coords.latitude.toFixed(4)}, ${loc.coords.longitude.toFixed(4)}`);
+            } catch (e) {
+              Alert.alert('Error', 'Could not get location.');
+            }
+          }}>
+            <Text style={styles.locationButtonText}>📍 Use Current Location</Text>
+          </TouchableOpacity>
 
           <TouchableOpacity style={styles.publishButton} onPress={handlePublish} disabled={saving}>
             {saving ? (
@@ -476,5 +496,19 @@ const styles = StyleSheet.create({
     color: '#000',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  locationButton: {
+    backgroundColor: '#333',
+    borderWidth: 1,
+    borderColor: '#555',
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 5,
+  },
+  locationButtonText: {
+    color: '#FFD700',
+    fontSize: 14,
+    fontWeight: '600',
   },
 });

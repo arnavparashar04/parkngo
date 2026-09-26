@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -15,6 +15,7 @@ export default function HomeScreen() {
   const [nearbyParking, setNearbyParking] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [showList, setShowList] = useState(true);
+  const [suggestions, setSuggestions] = useState<any[]>([]);
   
   // 3 distinct location concepts:
   // 1. userLocation  - GPS blue dot (never moves unless GPS updates)
@@ -24,6 +25,43 @@ export default function HomeScreen() {
   const [searchLocation, setSearchLocation] = useState<{lat: number, lng: number} | null>(null);
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [mapCenter, setMapCenter] = useState({ lat: 12.9353, lng: 77.5348 });
+
+  // Debounced search suggestions using Nominatim
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const fetchSuggestions = useCallback((query: string) => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    if (query.length < 3) { setSuggestions([]); return; }
+    debounceRef.current = setTimeout(async () => {
+      try {
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`,
+          { headers: { 'User-Agent': 'ParkNGoApp/1.0' } }
+        );
+        const text = await res.text();
+        try {
+          const data = JSON.parse(text);
+          setSuggestions(data || []);
+        } catch { setSuggestions([]); }
+      } catch { setSuggestions([]); }
+    }, 400);
+  }, []);
+
+  const onSearchTextChange = (text: string) => {
+    setSearchQuery(text);
+    fetchSuggestions(text);
+  };
+
+  const onSuggestionTap = (item: any) => {
+    const lat = parseFloat(item.lat);
+    const lng = parseFloat(item.lon);
+    setSuggestions([]);
+    setSearchQuery(item.display_name.split(',').slice(0, 2).join(', '));
+    setNearbyParking([]);
+    setSearchResults([]);
+    setSearchLocation({ lat, lng });
+    setMapCenter({ lat, lng });
+    fetchNearbyParking(lat, lng);
+  };
 
   // ── Fetch parking spots within 1km of a coordinate ──
   const fetchNearbyParking = async (lat: number, lng: number) => {
@@ -80,6 +118,7 @@ export default function HomeScreen() {
   // ── Search: geocode query → show yellow pins ──
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
+    setSuggestions([]); // clear dropdown
     try {
       setLoading(true);
       const response = await fetch(
@@ -124,17 +163,28 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Search Bar */}
+      {/* Search Bar + Suggestions */}
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.searchInput}
           placeholder="🔍 Search a destination..."
           placeholderTextColor="#888"
           value={searchQuery}
-          onChangeText={setSearchQuery}
+          onChangeText={onSearchTextChange}
           onSubmitEditing={handleSearch}
           returnKeyType="search"
         />
+        {suggestions.length > 0 && (
+          <View style={styles.suggestionsDropdown}>
+            {suggestions.map((item: any, i: number) => (
+              <TouchableOpacity key={i} style={styles.suggestionItem} onPress={() => onSuggestionTap(item)}>
+                <Text style={styles.suggestionText} numberOfLines={1}>
+                  📍 {item.display_name}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
       </View>
 
       {/* Map – 3 marker types: blue dot (you), yellow (search candidates), red (parking) + purple (selected) */}
@@ -237,6 +287,22 @@ const styles = StyleSheet.create({
   searchInput: {
     fontSize: 16,
     color: '#FFF',
+  },
+  suggestionsDropdown: {
+    backgroundColor: '#1E1E1E',
+    borderTopWidth: 1,
+    borderTopColor: '#333',
+    marginTop: 10,
+  },
+  suggestionItem: {
+    paddingVertical: 10,
+    paddingHorizontal: 5,
+    borderBottomWidth: 1,
+    borderBottomColor: '#2a2a2a',
+  },
+  suggestionText: {
+    color: '#DDD',
+    fontSize: 13,
   },
   bottomContainer: {
     position: 'absolute',
