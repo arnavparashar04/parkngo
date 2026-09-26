@@ -1,29 +1,41 @@
-import React, { useState } from 'react';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, SafeAreaView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, View, Text, TextInput, TouchableOpacity, SafeAreaView, Platform, ActivityIndicator } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import { useRouter } from 'expo-router';
+
+// Use 10.0.2.2 for Android emulator, localhost for iOS simulator/web
+const API_BASE_URL = Platform.OS === 'android' ? 'http://10.0.2.2:8000' : 'http://localhost:8000';
 
 export default function HomeScreen() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
-  
-  // Dummy data matching our backend MVP design
-  const nearbyParking = [
-    {
-      id: "parking_123",
-      latitude: 12.9353,
-      longitude: 77.5348,
-      price_per_hour: 30,
-      name: "PES University Parking"
-    },
-    {
-      id: "parking_124",
-      latitude: 12.9360,
-      longitude: 77.5355,
-      price_per_hour: 20,
-      name: "Residential Parking"
+  const [nearbyParking, setNearbyParking] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const fetchNearbyParking = async () => {
+    try {
+      setLoading(true);
+      // Hardcoded location for PES University for now
+      const lat = 12.9353;
+      const lng = 77.5348;
+      const response = await fetch(`${API_BASE_URL}/api/parking/nearby?lat=${lat}&lng=${lng}&vehicle_type=SUV`);
+      
+      if (response.ok) {
+        const data = await response.json();
+        setNearbyParking(data);
+      } else {
+        console.error('Failed to fetch parking spaces');
+      }
+    } catch (error) {
+      console.error('Error fetching parking:', error);
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  useEffect(() => {
+    fetchNearbyParking();
+  }, []);
 
   const handleMarkerPress = (id: string) => {
     router.push(`/parking/${id}`);
@@ -69,11 +81,14 @@ export default function HomeScreen() {
       <View style={styles.bottomContainer}>
         <TouchableOpacity 
           style={styles.primaryButton}
-          onPress={() => {
-            alert('Finding the best smart parking spaces near you! 🚗💨');
-          }}
+          onPress={fetchNearbyParking}
+          disabled={loading}
         >
-          <Text style={styles.primaryButtonText}>Find Parking</Text>
+          {loading ? (
+            <ActivityIndicator color="#000" />
+          ) : (
+            <Text style={styles.primaryButtonText}>Find Parking</Text>
+          )}
         </TouchableOpacity>
       </View>
     </SafeAreaView>
