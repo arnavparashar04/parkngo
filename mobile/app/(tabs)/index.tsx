@@ -58,7 +58,7 @@ export default function HomeScreen() {
       {/* Google Map */}
       <MapView 
         style={styles.map}
-        provider={Platform.OS === 'android' ? PROVIDER_GOOGLE : undefined}
+        provider={Platform.OS === 'ios' ? PROVIDER_GOOGLE : undefined}
         customMapStyle={[
           {
             "elementType": "geometry",
@@ -334,8 +334,7 @@ const styles = StyleSheet.create({
     color: '#FFF',
   },
   map: {
-    width: '100%',
-    height: '100%',
+    ...StyleSheet.absoluteFillObject,
   },
   markerContainer: {
     backgroundColor: '#FFD700',

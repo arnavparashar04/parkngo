@@ -12,9 +12,11 @@ export default {
     ios: {
       supportsTablet: true,
       bundleIdentifier: "com.arnav.parkngo",
-      config: {
-        googleMapsApiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY
-      }
+      ...(process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY ? {
+        config: {
+          googleMapsApiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY
+        }
+      } : {})
     },
     android: {
       package: "com.arnav.parkngo",
@@ -25,11 +27,13 @@ export default {
         monochromeImage: "./assets/android-icon-monochrome.png"
       },
       predictiveBackGestureEnabled: false,
-      config: {
-        googleMaps: {
-          apiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY
+      ...(process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY ? {
+        config: {
+          googleMaps: {
+            apiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY
+          }
         }
-      }
+      } : {})
     },
     web: {
       favicon: "./assets/favicon.png"
