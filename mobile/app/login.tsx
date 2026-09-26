@@ -74,6 +74,24 @@ export default function LoginScreen() {
             </Text>
           )}
         </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={styles.guestButton} 
+          onPress={async () => {
+            setLoading(true);
+            const { error } = await supabase.auth.signInAnonymously();
+            if (error) {
+              console.error(error);
+              alert("Please enable Anonymous Sign-ins in your Supabase Dashboard!");
+            }
+            setLoading(false);
+          }}
+          disabled={loading}
+        >
+          <Text style={styles.guestButtonText}>
+            Continue as Guest
+          </Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
@@ -112,6 +130,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 4,
+    marginBottom: 16,
   },
   disabledButton: {
     opacity: 0.7,
@@ -120,5 +139,18 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#000',
+  },
+  guestButton: {
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#333',
+    backgroundColor: '#1E1E1E',
+  },
+  guestButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#FFF',
   }
 });
