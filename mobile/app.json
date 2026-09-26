@@ -8,7 +8,10 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "config": {
+        "googleMapsApiKey": "AIzaSyCbsUFP40vYrdRmqnv2FL3Iw3UWKB9cRAY"
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -17,13 +20,25 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyCbsUFP40vYrdRmqnv2FL3Iw3UWKB9cRAY"
+        }
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      [
+        "react-native-maps",
+        {
+          "iosGoogleMapsApiKey": "AIzaSyCbsUFP40vYrdRmqnv2FL3Iw3UWKB9cRAY",
+          "androidGoogleMapsApiKey": "AIzaSyCbsUFP40vYrdRmqnv2FL3Iw3UWKB9cRAY"
+        }
+      ]
     ]
   }
 }

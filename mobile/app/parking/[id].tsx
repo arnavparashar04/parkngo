@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { openGoogleMapsNavigation } from '../../services/googleMaps';
 
 export default function ParkingDetailsScreen() {
   const { id } = useLocalSearchParams();
@@ -10,6 +11,8 @@ export default function ParkingDetailsScreen() {
   const parkingDetails = {
     id,
     name: "PES University Parking",
+    latitude: 12.9353,
+    longitude: 77.5348,
     price_per_hour: 30,
     distance: "180m",
     rating: 4.7,
@@ -44,6 +47,13 @@ export default function ParkingDetailsScreen() {
         ))}
 
         <View style={styles.divider} />
+
+        <TouchableOpacity 
+          style={styles.navigateButton}
+          onPress={() => openGoogleMapsNavigation(parkingDetails.latitude, parkingDetails.longitude, parkingDetails.name)}
+        >
+          <Text style={styles.navigateButtonText}>🗺️ Open in Google Maps</Text>
+        </TouchableOpacity>
 
         <TouchableOpacity 
           style={styles.bookButton}
@@ -114,12 +124,25 @@ const styles = StyleSheet.create({
     color: '#444',
     marginBottom: 5,
   },
+  navigateButton: {
+    backgroundColor: '#fff',
+    borderWidth: 1.5,
+    borderColor: '#000',
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  navigateButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#000',
+  },
   bookButton: {
     backgroundColor: '#FFD700',
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',
-    marginTop: 20,
   },
   bookButtonText: {
     fontSize: 18,
