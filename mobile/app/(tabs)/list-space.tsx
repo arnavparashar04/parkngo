@@ -103,7 +103,7 @@ export default function OwnerDashboard() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#121212',
   },
   scrollContent: {
     padding: 20,
@@ -113,6 +113,7 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: 'bold',
     marginBottom: 20,
+    color: '#FFF',
   },
   section: {
     marginBottom: 30,
@@ -127,9 +128,10 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 15,
+    color: '#FFF',
   },
   addButton: {
-    color: '#D4AF37',
+    color: '#FFD700',
     fontWeight: 'bold',
     fontSize: 16,
   },
@@ -138,35 +140,35 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   earningCard: {
-    backgroundColor: '#f8f8f8',
+    backgroundColor: '#1E1E1E',
     padding: 15,
     borderRadius: 12,
     flex: 1,
     marginHorizontal: 5,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#eee',
+    borderColor: '#333',
   },
   earningLabel: {
     fontSize: 12,
-    color: '#666',
+    color: '#AAA',
     marginBottom: 5,
   },
   earningValue: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#FFD700',
   },
   listingCard: {
-    backgroundColor: '#fff',
+    backgroundColor: '#1E1E1E',
     padding: 15,
     borderRadius: 12,
     marginBottom: 15,
     borderWidth: 1,
-    borderColor: '#eee',
+    borderColor: '#333',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
+    shadowOpacity: 0.5,
     shadowRadius: 4,
     elevation: 2,
   },
@@ -179,6 +181,7 @@ const styles = StyleSheet.create({
   listingName: {
     fontSize: 16,
     fontWeight: '600',
+    color: '#FFF',
   },
   statusBadge: {
     paddingHorizontal: 8,
@@ -186,19 +189,19 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   statusActive: {
-    backgroundColor: '#e6ffe6',
+    backgroundColor: '#2A4B2A',
   },
   statusPaused: {
-    backgroundColor: '#ffeee6',
+    backgroundColor: '#4B2A2A',
   },
   statusText: {
     fontSize: 12,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#FFF',
   },
   listingDetails: {
     fontSize: 14,
-    color: '#666',
+    color: '#AAA',
     marginBottom: 12,
   },
   listingActions: {
@@ -206,25 +209,26 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   actionButton: {
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#FFD700',
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 8,
   },
   actionButtonText: {
     fontWeight: '600',
+    color: '#000',
   },
   actionButtonSecondary: {
-    backgroundColor: '#fff',
+    backgroundColor: '#333',
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#555',
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 8,
   },
   actionButtonTextSecondary: {
     fontWeight: '600',
-    color: '#555',
+    color: '#FFF',
   },
   qrButton: {
     backgroundColor: '#FFD700',

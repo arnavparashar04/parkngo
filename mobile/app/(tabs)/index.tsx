@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, SafeAreaView, Platform, ActivityIndicator } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import { useRouter } from 'expo-router';
+import ShimmerPlaceholder from '../../components/ShimmerPlaceholder';
 
 // Use computer's local IP address so it works on emulators and physical devices
 const API_BASE_URL = 'http://10.57.179.137:8000';
@@ -48,6 +49,7 @@ export default function HomeScreen() {
         <TextInput 
           style={styles.searchInput}
           placeholder="🔍 Where are you going?"
+          placeholderTextColor="#888"
           value={searchQuery}
           onChangeText={setSearchQuery}
         />
@@ -56,6 +58,7 @@ export default function HomeScreen() {
       {/* Google Map */}
       <MapView 
         style={styles.map}
+        userInterfaceStyle="dark"
         initialRegion={{
           latitude: 12.9353,
           longitude: 77.5348,
@@ -79,7 +82,20 @@ export default function HomeScreen() {
 
       {/* Bottom Container */}
       <View style={styles.bottomContainer}>
-        {nearbyParking.length > 0 && (
+        {loading ? (
+          <View style={styles.listContainer}>
+            <Text style={styles.listTitle}>Loading Spots...</Text>
+            {[1, 2].map((i) => (
+              <View key={i} style={styles.listItem}>
+                <View>
+                  <ShimmerPlaceholder width={150} height={20} style={{ marginBottom: 6 }} />
+                  <ShimmerPlaceholder width={100} height={14} />
+                </View>
+                <ShimmerPlaceholder width={60} height={20} />
+              </View>
+            ))}
+          </View>
+        ) : nearbyParking.length > 0 && (
           <View style={styles.listContainer}>
             <Text style={styles.listTitle}>Recommended Spots</Text>
             {nearbyParking.map(space => (
@@ -99,11 +115,7 @@ export default function HomeScreen() {
           onPress={fetchNearbyParking}
           disabled={loading}
         >
-          {loading ? (
-            <ActivityIndicator color="#000" />
-          ) : (
-            <Text style={styles.primaryButtonText}>Refresh Parking</Text>
-          )}
+          <Text style={styles.primaryButtonText}>{loading ? 'Finding Parking...' : 'Refresh Parking'}</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -113,7 +125,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#121212',
   },
   searchContainer: {
     position: 'absolute',
@@ -121,18 +133,19 @@ const styles = StyleSheet.create({
     left: 20,
     right: 20,
     zIndex: 1,
-    backgroundColor: 'white',
+    backgroundColor: '#1E1E1E',
     borderRadius: 8,
     paddingHorizontal: 15,
     paddingVertical: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.5,
     shadowRadius: 4,
     elevation: 3,
   },
   searchInput: {
     fontSize: 16,
+    color: '#FFF',
   },
   map: {
     width: '100%',
@@ -149,6 +162,7 @@ const styles = StyleSheet.create({
   markerText: {
     fontWeight: 'bold',
     fontSize: 12,
+    color: '#000',
   },
   bottomContainer: {
     position: 'absolute',
@@ -173,13 +187,13 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   listContainer: {
-    backgroundColor: 'white',
+    backgroundColor: '#1E1E1E',
     borderRadius: 12,
     padding: 15,
     marginBottom: 15,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.5,
     shadowRadius: 4,
     elevation: 3,
   },
@@ -187,7 +201,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 10,
-    color: '#333',
+    color: '#FFF',
   },
   listItem: {
     flexDirection: 'row',
@@ -195,20 +209,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: '#333',
   },
   listName: {
     fontSize: 14,
     fontWeight: '600',
+    color: '#FFF',
   },
   listDetails: {
     fontSize: 12,
-    color: '#666',
+    color: '#AAA',
     marginTop: 2,
   },
   listPrice: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#000',
+    color: '#FFD700',
   }
 });

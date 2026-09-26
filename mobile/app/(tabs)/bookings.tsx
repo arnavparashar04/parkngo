@@ -88,22 +88,23 @@ export default function BookingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#121212',
   },
   header: {
     padding: 20,
     paddingTop: 40,
-    backgroundColor: '#fff',
+    backgroundColor: '#1E1E1E',
   },
   headerTitle: {
     fontSize: 28,
     fontWeight: 'bold',
+    color: '#FFF',
   },
   tabsContainer: {
     flexDirection: 'row',
-    backgroundColor: '#fff',
+    backgroundColor: '#1E1E1E',
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: '#333',
   },
   tab: {
     flex: 1,
@@ -117,11 +118,11 @@ const styles = StyleSheet.create({
   },
   tabText: {
     fontSize: 16,
-    color: '#666',
+    color: '#AAA',
     fontWeight: '500',
   },
   activeTabText: {
-    color: '#000',
+    color: '#FFD700',
     fontWeight: 'bold',
   },
   listContainer: {
@@ -134,17 +135,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   bookingCard: {
-    backgroundColor: '#fff',
+    backgroundColor: '#1E1E1E',
     padding: 20,
     borderRadius: 12,
     marginBottom: 15,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
+    shadowOpacity: 0.5,
     shadowRadius: 4,
     elevation: 2,
     borderWidth: 1,
-    borderColor: '#eee',
+    borderColor: '#333',
   },
   cardHeader: {
     flexDirection: 'row',
@@ -155,21 +156,22 @@ const styles = StyleSheet.create({
   parkingName: {
     fontSize: 18,
     fontWeight: 'bold',
+    color: '#FFF',
     flex: 1,
   },
   amount: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#FFD700',
   },
   divider: {
     height: 1,
-    backgroundColor: '#eee',
+    backgroundColor: '#333',
     marginBottom: 15,
   },
   detailText: {
     fontSize: 15,
-    color: '#555',
+    color: '#AAA',
     marginBottom: 8,
   },
   actionRow: {
@@ -190,15 +192,15 @@ const styles = StyleSheet.create({
   },
   secondaryButton: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#333',
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#555',
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: 'center',
   },
   secondaryButtonText: {
     fontWeight: 'bold',
-    color: '#333',
+    color: '#FFF',
   }
 });

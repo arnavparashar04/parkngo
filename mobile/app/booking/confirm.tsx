@@ -14,7 +14,7 @@ export default function BookingConfirmScreen() {
           <Text style={styles.passTitle}>PARKNGO PASS</Text>
           
           <View style={styles.qrPlaceholder}>
-            <Text>QR CODE</Text>
+            <Text style={{ color: '#888' }}>QR CODE</Text>
           </View>
           
           <View style={styles.passDetails}>
@@ -58,32 +58,34 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#fff',
+    backgroundColor: '#121212',
   },
   summaryTitle: {
     fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 20,
+    color: '#FFF',
   },
   summaryBox: {
     padding: 20,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#1E1E1E',
     borderRadius: 12,
     marginBottom: 30,
   },
   summaryText: {
     fontSize: 16,
     marginBottom: 10,
-    color: '#333',
+    color: '#AAA',
   },
   divider: {
     height: 1,
-    backgroundColor: '#ddd',
+    backgroundColor: '#333',
     marginVertical: 15,
   },
   totalText: {
     fontSize: 20,
     fontWeight: 'bold',
+    color: '#FFD700',
   },
   confirmButton: {
     backgroundColor: '#FFD700',
@@ -97,35 +99,36 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   passCard: {
-    backgroundColor: '#fff',
+    backgroundColor: '#1E1E1E',
     borderRadius: 16,
     padding: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.5,
     shadowRadius: 8,
     elevation: 5,
     alignItems: 'center',
     marginVertical: 40,
     borderWidth: 1,
-    borderColor: '#eee',
+    borderColor: '#333',
   },
   passTitle: {
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 20,
     letterSpacing: 2,
+    color: '#FFD700',
   },
   qrPlaceholder: {
     width: 200,
     height: 200,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#333',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 30,
     borderWidth: 2,
     borderStyle: 'dashed',
-    borderColor: '#ccc',
+    borderColor: '#555',
   },
   passDetails: {
     width: '100%',
@@ -134,11 +137,11 @@ const styles = StyleSheet.create({
   detailText: {
     fontSize: 16,
     marginBottom: 8,
-    color: '#333',
+    color: '#FFF',
     fontWeight: '500',
   },
   doneButton: {
-    backgroundColor: '#333',
+    backgroundColor: '#FFD700',
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',
@@ -146,6 +149,6 @@ const styles = StyleSheet.create({
   doneButtonText: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#000',
   }
 });

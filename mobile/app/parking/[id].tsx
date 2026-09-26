@@ -59,11 +59,11 @@ export default function ParkingDetailsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#121212',
   },
   imagePlaceholder: {
     height: 250,
-    backgroundColor: '#eee',
+    backgroundColor: '#1E1E1E',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -78,6 +78,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 10,
+    color: '#FFF',
   },
   row: {
     flexDirection: 'row',
@@ -88,30 +89,32 @@ const styles = StyleSheet.create({
   price: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#333',
+    color: '#FFD700',
   },
   rating: {
     fontSize: 16,
     fontWeight: '500',
+    color: '#FFF',
   },
   distance: {
     fontSize: 16,
-    color: '#666',
+    color: '#AAA',
     marginBottom: 20,
   },
   divider: {
     height: 1,
-    backgroundColor: '#ddd',
+    backgroundColor: '#333',
     marginVertical: 20,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
+    color: '#FFF',
   },
   detailText: {
     fontSize: 16,
-    color: '#444',
+    color: '#AAA',
     marginBottom: 5,
   },
   bookButton: {

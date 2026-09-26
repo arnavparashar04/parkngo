@@ -57,7 +57,12 @@ export default function ProfileScreen() {
           
           <View style={styles.settingRow}>
             <Text style={styles.settingLabel}>Push Notifications</Text>
-            <Switch value={true} onValueChange={() => {}} />
+            <Switch 
+              value={true} 
+              onValueChange={() => {}} 
+              trackColor={{ false: '#767577', true: '#FFD700' }}
+              thumbColor={true ? '#FFF' : '#f4f3f4'}
+            />
           </View>
           <View style={styles.divider} />
           
@@ -95,7 +100,7 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#121212',
   },
   scrollContent: {
     padding: 20,
@@ -127,24 +132,25 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 5,
+    color: '#FFF',
   },
   userEmail: {
     fontSize: 16,
-    color: '#555',
+    color: '#AAA',
     marginBottom: 2,
   },
   userPhone: {
     fontSize: 16,
-    color: '#777',
+    color: '#888',
   },
   section: {
     marginBottom: 35,
-    backgroundColor: '#fff',
+    backgroundColor: '#1E1E1E',
     borderRadius: 12,
     padding: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
+    shadowOpacity: 0.5,
     shadowRadius: 4,
     elevation: 2,
   },
@@ -157,30 +163,31 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#FFF',
     marginBottom: 10,
   },
   addButton: {
-    color: '#D4AF37',
+    color: '#FFD700',
     fontWeight: 'bold',
     fontSize: 16,
   },
   vehicleCard: {
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#222',
     padding: 15,
     borderRadius: 8,
     marginBottom: 10,
     borderWidth: 1,
-    borderColor: '#eee',
+    borderColor: '#333',
   },
   vehicleModel: {
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 4,
+    color: '#FFF',
   },
   vehicleReg: {
     fontSize: 14,
-    color: '#666',
+    color: '#AAA',
   },
   settingRow: {
     flexDirection: 'row',
@@ -190,7 +197,7 @@ const styles = StyleSheet.create({
   },
   settingLabel: {
     fontSize: 16,
-    color: '#333',
+    color: '#FFF',
   },
   settingValue: {
     fontSize: 16,
@@ -198,16 +205,16 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: '#eee',
+    backgroundColor: '#333',
   },
   actionRow: {
     paddingVertical: 15,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: '#333',
   },
   actionText: {
     fontSize: 16,
-    color: '#333',
+    color: '#FFF',
     fontWeight: '500',
   }
 });
