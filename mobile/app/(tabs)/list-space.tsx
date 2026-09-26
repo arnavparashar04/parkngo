@@ -103,7 +103,7 @@ export default function OwnerDashboard() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#121212',
+    backgroundColor: '#000000',
   },
   scrollContent: {
     padding: 20,

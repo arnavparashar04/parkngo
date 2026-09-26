@@ -1,6 +1,12 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .routes import parking
+from .database.connection import engine, Base
+# Import models so Base metadata is aware of them
+from .models import parking as parking_model
+
+# Create all database tables
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="ParkNGo API")
 
