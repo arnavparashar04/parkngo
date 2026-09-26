@@ -1,107 +1,80 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, SafeAreaView, KeyboardAvoidingView, Platform } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, SafeAreaView, Platform } from 'react-native';
 import { supabase } from '../lib/supabase';
-import { useRouter } from 'expo-router';
+import * as WebBrowser from 'expo-web-browser';
+import * as Linking from 'expo-linking';
+
+// Ensure the web browser closes if auth is cancelled
+WebBrowser.maybeCompleteAuthSession();
 
 export default function LoginScreen() {
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
-  const [otpSent, setOtpSent] = useState(false);
-  const router = useRouter();
 
-  async function signInWithPhone() {
-    if (!phoneNumber) {
-      Alert.alert('Error', 'Please enter a valid phone number (e.g. +13334445555)');
+  // Set up the deep link for OAuth redirection
+  const redirectTo = Linking.createURL('/(tabs)');
+
+  const handleGoogleLogin = async () => {
+    setLoading(true);
+    
+    // 1. Get the OAuth provider URL from Supabase
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo,
+        skipBrowserRedirect: true,
+      },
+    });
+
+    if (error) {
+      console.error(error);
+      setLoading(false);
       return;
     }
 
-    setLoading(true);
-    const { error } = await supabase.auth.signInWithOtp({
-      phone: phoneNumber,
-    });
-    setLoading(false);
-
-    if (error) {
-      Alert.alert('Error', error.message);
-    } else {
-      setOtpSent(true);
-      Alert.alert('Success', 'OTP sent to your phone!');
-    }
-  }
-
-  async function verifyOtp() {
-    if (!otp) {
-      Alert.alert('Error', 'Please enter the OTP');
+    if (!data?.url) {
+      console.error("No URL returned for OAuth");
+      setLoading(false);
       return;
     }
 
-    setLoading(true);
-    const { error, data } = await supabase.auth.verifyOtp({
-      phone: phoneNumber,
-      token: otp,
-      type: 'sms',
-    });
-    setLoading(false);
-
-    if (error) {
-      Alert.alert('Error', error.message);
-    } else if (data.session) {
-      // Navigate to the main tabs if successful
-      router.replace('/(tabs)');
+    // 2. Open the URL in the system browser
+    try {
+      const result = await WebBrowser.openAuthSessionAsync(data.url, redirectTo);
+      
+      // 3. Handle the redirect back into the app
+      if (result.type === 'success') {
+        const url = new URL(result.url);
+        // Supabase will attach `#access_token=...` or `?code=...` 
+        // We can pass the URL to supabase to process the session
+        await supabase.auth.getSessionFromUrl(result.url);
+      }
+    } catch (err) {
+      console.error('Browser error:', err);
+    } finally {
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView 
-        style={styles.keyboardContainer}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      >
-        <View style={styles.formContainer}>
-          <Text style={styles.title}>Welcome to ParkNGo</Text>
-          <Text style={styles.subtitle}>
-            {otpSent ? 'Enter the code sent to your phone' : 'Enter your phone number to continue'}
-          </Text>
+      <View style={styles.formContainer}>
+        <Text style={styles.title}>Welcome to ParkNGo</Text>
+        <Text style={styles.subtitle}>Sign in to discover and book parking</Text>
 
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
-              placeholder={otpSent ? "6-digit OTP" : "+1 234 567 8900"}
-              placeholderTextColor="#888"
-              value={otpSent ? otp : phoneNumber}
-              onChangeText={otpSent ? setOtp : setPhoneNumber}
-              keyboardType="phone-pad"
-              autoCapitalize="none"
-              editable={!loading}
-            />
-          </View>
-
-          <TouchableOpacity 
-            style={[styles.primaryButton, loading && styles.disabledButton]} 
-            onPress={otpSent ? verifyOtp : signInWithPhone}
-            disabled={loading}
-          >
-            {loading ? (
-              <ActivityIndicator color="#000" />
-            ) : (
-              <Text style={styles.primaryButtonText}>
-                {otpSent ? 'Verify OTP' : 'Send OTP'}
-              </Text>
-            )}
-          </TouchableOpacity>
-
-          {otpSent && (
-            <TouchableOpacity 
-              style={styles.secondaryButton} 
-              onPress={() => { setOtpSent(false); setOtp(''); }}
-              disabled={loading}
-            >
-              <Text style={styles.secondaryButtonText}>Change Phone Number</Text>
-            </TouchableOpacity>
+        <TouchableOpacity 
+          style={[styles.primaryButton, loading && styles.disabledButton]} 
+          onPress={handleGoogleLogin}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator color="#000" />
+          ) : (
+            <Text style={styles.primaryButtonText}>
+              Continue with Google
+            </Text>
           )}
-        </View>
-      </KeyboardAvoidingView>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 }
@@ -110,9 +83,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#000000',
-  },
-  keyboardContainer: {
-    flex: 1,
   },
   formContainer: {
     flex: 1,
@@ -124,24 +94,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#FFD700',
     marginBottom: 8,
+    textAlign: 'center',
   },
   subtitle: {
     fontSize: 16,
     color: '#AAA',
-    marginBottom: 32,
-  },
-  inputContainer: {
-    backgroundColor: '#1E1E1E',
-    borderRadius: 12,
-    marginBottom: 20,
-    borderWidth: 1,
-    borderColor: '#333',
-  },
-  input: {
-    fontSize: 18,
-    color: '#FFF',
-    paddingHorizontal: 16,
-    paddingVertical: 16,
+    marginBottom: 40,
+    textAlign: 'center',
   },
   primaryButton: {
     backgroundColor: '#FFD700',
@@ -161,15 +120,5 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#000',
-  },
-  secondaryButton: {
-    marginTop: 16,
-    paddingVertical: 12,
-    alignItems: 'center',
-  },
-  secondaryButtonText: {
-    fontSize: 16,
-    color: '#FFD700',
-    fontWeight: '600',
   }
 });
