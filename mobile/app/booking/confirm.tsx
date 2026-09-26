@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import QRCode from 'react-native-qrcode-svg';
 
 export default function BookingConfirmScreen() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
   const [confirmed, setConfirmed] = useState(false);
+  const bookingId = `PNGO${Math.floor(1000 + Math.random() * 9000)}`;
 
   if (confirmed) {
     return (
@@ -13,12 +15,17 @@ export default function BookingConfirmScreen() {
         <View style={styles.passCard}>
           <Text style={styles.passTitle}>PARKNGO PASS</Text>
           
-          <View style={styles.qrPlaceholder}>
-            <Text style={{ color: '#888' }}>QR CODE</Text>
+          <View style={styles.qrContainer}>
+            <QRCode 
+              value={`parkngo://booking/${bookingId}`}
+              size={200}
+              color="#000"
+              backgroundColor="#FFF"
+            />
           </View>
           
           <View style={styles.passDetails}>
-            <Text style={styles.detailText}>Booking: #PNGO1024</Text>
+            <Text style={styles.detailText}>Booking: #{bookingId}</Text>
             <Text style={styles.detailText}>Vehicle: KA XX XXXX</Text>
             <Text style={styles.detailText}>4:00 PM - 6:00 PM</Text>
           </View>
@@ -119,16 +126,16 @@ const styles = StyleSheet.create({
     letterSpacing: 2,
     color: '#FFD700',
   },
-  qrPlaceholder: {
-    width: 200,
-    height: 200,
-    backgroundColor: '#333',
-    justifyContent: 'center',
-    alignItems: 'center',
+  qrContainer: {
+    padding: 10,
+    backgroundColor: '#FFF',
+    borderRadius: 8,
     marginBottom: 30,
-    borderWidth: 2,
-    borderStyle: 'dashed',
-    borderColor: '#555',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
   },
   passDetails: {
     width: '100%',
