@@ -39,10 +39,6 @@ export default function BookingsScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>My Bookings</Text>
-      </View>
-
       {/* Tabs */}
       <View style={styles.tabsContainer}>
         {['Upcoming', 'Completed', 'Cancelled'].map(tab => (

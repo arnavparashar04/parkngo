@@ -67,7 +67,12 @@ export default function HomeScreen() {
 
       {/* Floating Find Parking Button */}
       <View style={styles.bottomContainer}>
-        <TouchableOpacity style={styles.primaryButton}>
+        <TouchableOpacity 
+          style={styles.primaryButton}
+          onPress={() => {
+            alert('Finding the best smart parking spaces near you! 🚗💨');
+          }}
+        >
           <Text style={styles.primaryButtonText}>Find Parking</Text>
         </TouchableOpacity>
       </View>
@@ -82,7 +87,7 @@ const styles = StyleSheet.create({
   },
   searchContainer: {
     position: 'absolute',
-    top: 50,
+    top: 15,
     left: 20,
     right: 20,
     zIndex: 1,

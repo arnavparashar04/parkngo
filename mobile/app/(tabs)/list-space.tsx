@@ -32,7 +32,6 @@ export default function OwnerDashboard() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Text style={styles.headerTitle}>Owner Dashboard</Text>
         
         {/* Earnings Section */}
         <View style={styles.section}>
