@@ -76,6 +76,10 @@ export default function LeafletMap({
       transform: translate(-50%, -50%) scale(0.95);
       background-color: #e6c200;
     }
+    /* Pure dark mode filter for OpenStreetMap tiles - NO watermark, NO API keys needed */
+    .leaflet-tile-pane {
+      filter: invert(100%) hue-rotate(180deg) brightness(85%) contrast(95%);
+    }
     /* Hide Leaflet bottom attribution bar for clean app UI */
     .leaflet-control-attribution {
       display: none !important;
@@ -91,16 +95,14 @@ export default function LeafletMap({
 <body>
   <div id="map"></div>
   <script>
-    // Initialize map with Dark Matter tiles (free OpenStreetMap tiles by CartoDB)
     var map = L.map('map', {
       zoomControl: false,
       attributionControl: false
     }).setView([${initialLat}, ${initialLng}], ${initialZoom});
 
-    // Dark Matter tile layer - NO API KEY NEEDED
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      maxZoom: 19,
-      subdomains: 'abcd'
+    // 100% Free OpenStreetMap tile server - NO API KEY OR ACCOUNT REQUIRED
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19
     }).addTo(map);
 
     // Zoom control at top right
