@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, SafeAreaView, Platform, ActivityIndicator } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { useRouter } from 'expo-router';
 import ShimmerPlaceholder from '../../components/ShimmerPlaceholder';
 
@@ -58,6 +58,7 @@ export default function HomeScreen() {
       {/* Google Map */}
       <MapView 
         style={styles.map}
+        provider={PROVIDER_GOOGLE}
         userInterfaceStyle="dark"
         initialRegion={{
           latitude: 12.9353,
