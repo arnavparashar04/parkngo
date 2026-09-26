@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Stack } from 'expo-router';
+import { Stack, useRouter, useSegments } from 'expo-router';
 import { View, Image, StyleSheet } from 'react-native';
+import { supabase } from '../lib/supabase';
+import { Session } from '@supabase/supabase-js';
 
 function CustomSplashScreen({ onFinish }: { onFinish: () => void }) {
   useEffect(() => {
@@ -27,6 +29,35 @@ function CustomSplashScreen({ onFinish }: { onFinish: () => void }) {
 
 export default function RootLayout() {
   const [isReady, setIsReady] = useState(false);
+  const [session, setSession] = useState<Session | null>(null);
+  const router = useRouter();
+  const segments = useSegments();
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+    
+    return () => subscription.unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    if (!isReady) return;
+
+    const inAuthGroup = segments[0] === 'login';
+
+    if (!session && !inAuthGroup) {
+      // Redirect to the sign-in page.
+      router.replace('/login');
+    } else if (session && inAuthGroup) {
+      // Redirect away from the sign-in page.
+      router.replace('/(tabs)');
+    }
+  }, [session, isReady, segments]);
 
   if (!isReady) {
     return <CustomSplashScreen onFinish={() => setIsReady(true)} />;
@@ -34,6 +65,7 @@ export default function RootLayout() {
 
   return (
     <Stack>
+      <Stack.Screen name="login" options={{ headerShown: false }} />
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="parking/[id]" options={{ presentation: 'modal', title: 'Parking Details' }} />
       <Stack.Screen name="booking/confirm" options={{ title: 'Confirm Booking' }} />
