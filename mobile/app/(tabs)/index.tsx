@@ -3,8 +3,8 @@ import { StyleSheet, View, Text, TextInput, TouchableOpacity, SafeAreaView, Plat
 import MapView, { Marker } from 'react-native-maps';
 import { useRouter } from 'expo-router';
 
-// Use 10.0.2.2 for Android emulator, localhost for iOS simulator/web
-const API_BASE_URL = Platform.OS === 'android' ? 'http://10.0.2.2:8000' : 'http://localhost:8000';
+// Use computer's local IP address so it works on emulators and physical devices
+const API_BASE_URL = 'http://10.57.179.137:8000';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -77,8 +77,23 @@ export default function HomeScreen() {
         ))}
       </MapView>
 
-      {/* Floating Find Parking Button */}
+      {/* Bottom Container */}
       <View style={styles.bottomContainer}>
+        {nearbyParking.length > 0 && (
+          <View style={styles.listContainer}>
+            <Text style={styles.listTitle}>Recommended Spots</Text>
+            {nearbyParking.map(space => (
+              <TouchableOpacity key={space.id} style={styles.listItem} onPress={() => handleMarkerPress(space.id)}>
+                <View>
+                  <Text style={styles.listName}>{space.name}</Text>
+                  <Text style={styles.listDetails}>Score: {space.recommendation_score} • {space.distance}m</Text>
+                </View>
+                <Text style={styles.listPrice}>₹{space.price_per_hour}/hr</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+
         <TouchableOpacity 
           style={styles.primaryButton}
           onPress={fetchNearbyParking}
@@ -87,7 +102,7 @@ export default function HomeScreen() {
           {loading ? (
             <ActivityIndicator color="#000" />
           ) : (
-            <Text style={styles.primaryButtonText}>Find Parking</Text>
+            <Text style={styles.primaryButtonText}>Refresh Parking</Text>
           )}
         </TouchableOpacity>
       </View>
@@ -154,6 +169,45 @@ const styles = StyleSheet.create({
   },
   primaryButtonText: {
     fontSize: 18,
+    fontWeight: 'bold',
+    color: '#000',
+  },
+  listContainer: {
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 15,
+    marginBottom: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  listTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#333',
+  },
+  listItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  listName: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  listDetails: {
+    fontSize: 12,
+    color: '#666',
+    marginTop: 2,
+  },
+  listPrice: {
+    fontSize: 14,
     fontWeight: 'bold',
     color: '#000',
   }
